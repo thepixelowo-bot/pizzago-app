@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bebidas",
+  "info": {
+    "singularName": "bebida",
+    "pluralName": "bebidas",
+    "displayName": "Bebida"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "text"
+    },
+    "precio": {
+      "type": "decimal"
+    },
+    "imagen": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "activo": {
+      "type": "boolean"
+    }
+  }
+}

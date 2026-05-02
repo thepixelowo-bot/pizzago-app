@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "extras",
+  "info": {
+    "singularName": "extra",
+    "pluralName": "extras",
+    "displayName": "Extra"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "text"
+    },
+    "precio": {
+      "type": "decimal"
+    },
+    "imagen": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "activo": {
+      "type": "boolean"
+    }
+  }
+}

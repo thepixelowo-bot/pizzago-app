@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>PizzaGo | Inicio</title>
+  <link rel="stylesheet" href="css/inicio.css">
+</head>
+<body>
+
+  <!-- LADO IZQUIERDO: IMAGEN -->
+  <div class="in-image-side">
+    <img src="img/pizza.png" alt="Pizza PizzaGo">
+    <div class="in-image-overlay"></div>
+    <div class="in-brand-block">
+      <div class="in-logo">
+        <div class="in-logo-icon">
+          <img src="img/logo.png" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span style="display:none">🍕</span>
+        </div>
+        <span>PizzaGo</span>
+      </div>
+      <h1 class="in-tagline" id="inTagline">Las mejores pizzas,<br>directo a <em>tu puerta.</em></h1>
+      <p class="in-sub" id="inSub">Únete a nuestra comunidad y disfruta de pizzas artesanales con los mejores ingredientes.</p>
+    </div>
+  </div>
+
+  <!-- LADO DERECHO -->
+  <div class="in-form-side flex flex-col justify-center">
+
+    <!-- TABS -->
+    <div class="in-tabs">
+      <button class="in-tab active" id="tabLogin" onclick="inMostrar('login')">Iniciar sesión</button>
+      <button class="in-tab" id="tabRegistro" onclick="inMostrar('registro')">Crear cuenta</button>
+    </div>
+
+    <!-- ── FORMULARIO LOGIN ── -->
+    <div id="inFormLogin" class="in-form-wrap">
+      <div class="in-form-header">
+        <h2>Bienvenido de vuelta</h2>
+        <p>Ingresa tus datos para continuar</p>
+      </div>
+
+      <form id="loginForm" class="flex flex-col gap-4" onsubmit="iniciarSesion(event)">
+        <div class="in-field">
+          <label>Correo o teléfono</label>
+          <div class="in-input-wrap">
+            <span class="in-icon">✉️</span>
+            <input type="text" id="loginUsuario" placeholder="correo@ejemplo.com o 9611234567" autocomplete="username">
+          </div>
+        </div>
+
+        <div class="in-field">
+          <label>Contraseña</label>
+          <div class="in-input-wrap">
+            <span class="in-icon">🔒</span>
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="in-eye" onclick="inTogglePass('loginPassword', this)">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="in-btn-primary w-full font-bold tracking-wide">
+          Iniciar sesión →
+        </button>
+
+        <p id="loginMensaje" class="in-mensaje"></p>
+      </form>
+
+      <div class="in-divider"><span>o continúa con</span></div>
+
+      <button type="button" class="in-google-btn" onclick="loginConGoogle()">
+        <img src="https://www.google.com/favicon.ico" alt="Google" width="18">
+        Iniciar sesión con Google
+      </button>
+
+      <div class="in-switch">
+        ¿No tienes cuenta? <a onclick="inMostrar('registro')">Crear una cuenta</a>
+      </div>
+
+      <a href="./mostrador-login.html" class="in-admin-link">Acceso administrador →</a>
+    </div>
+
+    <!-- ── FORMULARIO REGISTRO ── -->
+    <div id="inFormRegistro" class="in-form-wrap" style="display:none">
+      <div class="in-form-header">
+        <h2>Crear Cuenta</h2>
+        <p>Comienza tu viaje a la pizza perfecta</p>
+      </div>
+
+      <form id="registroForm" class="flex flex-col gap-4" onsubmit="registrar(event)">
+        <div class="in-field">
+          <label>Nombre completo</label>
+          <div class="in-input-wrap">
+            <span class="in-icon">👤</span>
+            <input type="text" id="regNombre" placeholder="Tu nombre completo" autocomplete="name">
+          </div>
+        </div>
+
+        <div class="in-field">
+          <label>Correo o teléfono</label>
+          <div class="in-input-wrap">
+            <span class="in-icon">✉️</span>
+            <input type="text" id="regUsuario" placeholder="correo@ejemplo.com o 9611234567" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="in-field">
+          <label>Número de teléfono</label>
+          <div class="in-input-wrap">
+            <span class="in-icon">📞</span>
+            <input type="tel" id="regTelefono" placeholder="10 dígitos" maxlength="10" oninput="soloNumeros(this)" autocomplete="tel">
+          </div>
+        </div>
+        <div class="in-field">
+          <label>Contraseña</label>
+          <div class="in-input-wrap">
+            <span class="in-icon">🔒</span>
+            <input type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password">
+            <button type="button" class="in-eye" onclick="inTogglePass('regPassword', this)">👁</button>
+          </div>
+        </div>
+
+        <div class="in-field">
+          <label>Confirmar contraseña</label>
+          <div class="in-input-wrap">
+            <span class="in-icon">🔒</span>
+            <input type="password" id="regConfirmar" placeholder="••••••••" autocomplete="new-password">
+            <button type="button" class="in-eye" onclick="inTogglePass('regConfirmar', this)">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="in-btn-primary w-full font-bold tracking-wide">
+          Crear Cuenta →
+        </button>
+
+        <p id="registroMensaje" class="in-mensaje"></p>
+      </form>
+
+      <div class="in-divider"><span>o continúa con</span></div>
+
+      <button type="button" class="in-google-btn" onclick="loginConGoogle()">
+        <img src="https://www.google.com/favicon.ico" alt="Google" width="18">
+        Registrarse con Google
+      </button>
+
+      <div class="in-switch">
+        ¿Ya tienes cuenta? <a onclick="inMostrar('login')">Iniciar sesión</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/inicio.js"></script>
+</body>
+</html>

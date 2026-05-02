@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PizzaGo | Cliente</title>
+  <link rel="stylesheet" href="css/cliente.css">
+</head>
+<body>
+
+  <header class="pg-topbar">
+    <!-- FRANJA SUPERIOR -->
+    <div class="pg-topbar-top">
+      <div class="pg-brand">
+        <div class="pg-logo-icon">
+          <img src="img/logo.png" alt="PizzaGo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span style="display:none">🍕</span>
+        </div>
+        <span class="pg-brand-name">PizzaGo</span>
+      </div>
+
+      <nav class="pg-nav">
+        <button class="pg-nav-btn" onclick="mostrarSeccion('bienvenida', this)">INICIO</button>
+        <button class="pg-nav-btn" onclick="mostrarSeccion('menu', this)">MENÚ</button>
+        <button class="pg-nav-btn" onclick="mostrarSeccion('personalizar', this)">PERSONALIZAR</button>
+        <button class="pg-nav-btn" onclick="mostrarSeccion('cuenta', this)">MI CUENTA</button>
+      </nav>
+
+      <div class="pg-topbar-right">
+        <!-- Modo oscuro/claro -->
+        <button class="pg-theme-btn" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">
+          <span id="themeIcon">🌙</span>
+        </button>
+
+        <!-- Usuario -->
+        <div class="pg-user-btn" onclick="mostrarSeccion('cuenta')">
+          <span class="pg-user-icon">👤</span>
+          <div class="pg-user-txt">
+            <small>Hola,</small>
+            <strong id="nombreUsuario">Cliente</strong>
+          </div>
+        </div>
+
+        <!-- Carrito -->
+        <button class="pg-carrito-btn" onclick="mostrarSeccion('carrito')">
+          <span>🛒</span>
+          <div class="pg-carrito-txt">
+            <small>Mi carrito</small>
+            <strong id="contadorCarrito">0</strong>
+          </div>
+        </button>
+
+        <button class="pg-logout-btn" onclick="cerrarSesion()">Salir</button>
+      </div>
+    </div>
+
+  </header>
+
+  <main class="main-content">
+
+    <!-- BIENVENIDA -->
+    <section id="bienvenida" class="seccion activa pg-home">
+
+      <!-- BANNER PRINCIPAL + PROMOS LATERALES -->
+      <div class="pg-banner-grid">
+
+        <!-- BANNER GRANDE IZQUIERDO -->
+        <div class="pg-banner-main">
+          <img src="img/pizza.png" alt="PizzaGo Promo" class="pg-banner-img">
+          <div class="pg-banner-overlay">
+            <p class="pg-banner-sub" id="saludoTiempo">¡Buen día!</p>
+            <h2 class="pg-banner-titulo">La pizza perfecta<br>te espera</h2>
+            <div class="pg-banner-precio">
+              <span class="pg-precio-desde">DESDE</span>
+              <strong>$99</strong>
+              <span class="pg-precio-mxn">MXN</span>
+            </div>
+            <button class="pg-banner-cta" onclick="mostrarSeccion('menu')">ORDENA AQUÍ</button>
+          </div>
+        </div>
+
+        <!-- PROMOS LATERALES -->
+        <div class="pg-promos-col">
+
+          <div class="pg-promo-card" onclick="agregarCombo('Combo Pepperoni Grande', 249)">
+            <div class="pg-promo-img"><img src="img/pepperoni.png" alt="Pepperoni"></div>
+            <div class="pg-promo-info">
+              <span class="pg-promo-tag">POPULAR</span>
+              <p>Pizza Grande<br><strong>Pepperoni</strong></p>
+              <div class="pg-promo-precio">
+                <span>$293</span>
+                <strong>$249</strong>
+              </div>
+              <button class="pg-promo-btn">ORDENA AQUÍ</button>
+            </div>
+          </div>
+
+          <div class="pg-promo-card" onclick="agregarCombo('Combo Familiar Hawaiana', 399)">
+            <div class="pg-promo-img"><img src="img/hawaiana.png" alt="Hawaiana"></div>
+            <div class="pg-promo-info">
+              <span class="pg-promo-tag pg-tag-familiar">FAMILIAR</span>
+              <p>Pizza Familiar<br><strong>Hawaiana</strong></p>
+              <div class="pg-promo-precio">
+                <span>$478</span>
+                <strong>$399</strong>
+              </div>
+              <button class="pg-promo-btn">ORDENA AQUÍ</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SEGUNDA FILA: MÁS PROMOS -->
+      <div class="pg-promos-row">
+
+        <div class="pg-promo-wide" onclick="agregarCombo('Combo Dúo Mediana', 349)">
+          <div class="pg-promo-wide-img"><img src="img/mexicana.png" alt="Mexicana"></div>
+          <div class="pg-promo-wide-body">
+            <span class="pg-promo-tag pg-tag-duo">DÚO</span>
+            <h3>2 Pizzas Medianas</h3>
+            <p>+ 2 refrescos + Nachos</p>
+            <div class="pg-promo-wide-precio">
+              <span>$418</span>
+              <strong>$349</strong>
+            </div>
+          </div>
+          <button class="pg-promo-wide-cta">ORDENA AQUÍ</button>
+        </div>
+
+        <div class="pg-promo-wide" onclick="agregarCombo('Combo Ahorro', 219)">
+          <div class="pg-promo-wide-img"><img src="img/vegetariana.jpg" alt="Vegetariana"></div>
+          <div class="pg-promo-wide-body">
+            <span class="pg-promo-tag pg-tag-ahorro">AHORRO</span>
+            <h3>Pizza Mediana</h3>
+            <p>+ refresco + Aros de cebolla</p>
+            <div class="pg-promo-wide-precio">
+              <span>$259</span>
+              <strong>$219</strong>
+            </div>
+          </div>
+          <button class="pg-promo-wide-cta">ORDENA AQUÍ</button>
+        </div>
+
+        <div class="pg-promo-wide" onclick="mostrarSeccion('personalizar')">
+          <div class="pg-promo-wide-img"><img src="img/carnes.png" alt="Personaliza"></div>
+          <div class="pg-promo-wide-body">
+            <span class="pg-promo-tag pg-tag-custom">NUEVO</span>
+            <h3>Crea tu Pizza</h3>
+            <p>Elige sabores, tamaño y orilla</p>
+            <div class="pg-promo-wide-precio">
+              <strong>¡A tu gusto!</strong>
+            </div>
+          </div>
+          <button class="pg-promo-wide-cta">PERSONALIZAR</button>
+        </div>
+
+      </div>
+
+      <!-- CARRUSEL ESPECIALIDADES -->
+      <div class="pg-especialidades">
+        <div class="pg-esp-header">
+          <h2>Nuestras Especialidades</h2>
+          <button class="pg-esp-ver-todo" onclick="mostrarSeccion('menu')">Ver todo el menú →</button>
+        </div>
+        <div class="pg-carousel-wrap">
+          <button class="pg-carr-btn" onclick="carruselMover(-1)">‹</button>
+          <div class="pg-carousel" id="hmCarousel">
+            <div class="pg-carr-item" onclick="mostrarSeccion('menu')">
+              <img src="img/hawaiana.png" alt="Hawaiana">
+              <strong>Hawaiana</strong><span>Jamón + Piña · desde $99</span>
+            </div>
+            <div class="pg-carr-item" onclick="mostrarSeccion('menu')">
+              <img src="img/pepperoni.png" alt="Pepperoni">
+              <strong>Pepperoni</strong><span>La más vendida · desde $99</span>
+            </div>
+            <div class="pg-carr-item" onclick="mostrarSeccion('menu')">
+              <img src="img/mexicana.png" alt="Mexicana">
+              <strong>Mexicana</strong><span>Sabor intenso · desde $99</span>
+            </div>
+            <div class="pg-carr-item" onclick="mostrarSeccion('menu')">
+              <img src="img/vegetariana.jpg" alt="Vegetariana">
+              <strong>Vegetariana</strong><span>Fresca y ligera · desde $99</span>
+            </div>
+            <div class="pg-carr-item" onclick="mostrarSeccion('menu')">
+              <img src="img/carnes.png" alt="Carnes Frías">
+              <strong>Carnes Frías</strong><span>Para carnívoros · desde $99</span>
+            </div>
+            <div class="pg-carr-item" onclick="mostrarSeccion('menu')">
+              <img src="img/jamon.jpg" alt="Jamón">
+              <strong>Clásica Jamón</strong><span>Siempre favorita · desde $99</span>
+            </div>
+          </div>
+          <button class="pg-carr-btn" onclick="carruselMover(1)">›</button>
+        </div>
+        <div class="hm-carr-dots" id="hmDots"></div>
+      </div>
+
+
+      <!-- FOOTER HOME -->
+      <div class="pg-home-footer">
+        <span>🍕 PizzaGo</span>
+        <p>© 2025 PizzaGo. Todos los derechos reservados.</p>
+      </div>
+
+    </section>
+
+    <!-- MENÚ -->
+    <section id="menu" class="seccion mn-page-light">
+      <!-- HERO -->
+      <div class="mn-hero-light">
+        <div class="mn-hero-light-txt">
+          <p class="mn-hero-light-sub">Descubre nuestros sabores</p>
+          <h2>Nuestro Menú</h2>
+          <p>Ingredientes frescos, sabor artesanal en cada rebanada</p>
+        </div>
+        <img src="img/pizza.png" alt="Pizza" class="mn-hero-light-img">
+      </div>
+
+      <div class="mn-tabs mn-tabs-light">
+        <button class="mn-tab active" onclick="cambiarCategoriaMenu('pizzas', this)">🍕 Pizzas</button>
+        <button class="mn-tab" onclick="cambiarCategoriaMenu('bebidas', this)">🥤 Bebidas</button>
+        <button class="mn-tab" onclick="cambiarCategoriaMenu('extras', this)">🍟 Extras</button>
+      </div>
+
+      <div class="mn-page mn-page-content">
+
+        <!-- PIZZAS -->
+        <div class="mn-categoria" id="cat-pizzas">
+          <div class="mn-titulo"><span>🍕</span> Pizzas</div>
+          <div class="mn-grid" id="grid-pizzas">
+            <div class="mn-loading">Cargando pizzas...</div>
+          </div>
+        </div>
+        <!-- placeholder para el cierre del bloque original -->
+        <div style="display:none">
+
+            <article class="mn-card">
+              <div class="mn-card-img">
+                <img src="img/hawaiana.png" alt="Hawaiana">
+                <span class="mn-badge">Favorita</span>
+              </div>
+              <div class="mn-card-body">
+                <div class="mn-card-top"><h3>Hawaiana</h3><span class="mn-precio">$189</span></div>
+                <p>Combinación perfecta de jamón, piña y queso mozzarella fundido sobre salsa de tomate.</p>
+                <button class="mn-btn-agregar" onclick="abrirPizzaModal('img/hawaiana.png', 'Pizza Hawaiana', 'Combinación perfecta de jamón, piña y queso mozzarella fundido sobre salsa de tomate artesanal.')">Ver detalles</button>
+              </div>
+            </article>
+
+            <article class="mn-card">
+              <div class="mn-card-img"><img src="img/vegetariana.jpg" alt="Vegetariana"></div>
+              <div class="mn-card-body">
+                <div class="mn-card-top"><h3>Vegetariana</h3><span class="mn-precio">$179</span></div>
+                <p>Pimientos verdes, cebolla morada, champiñones frescos, aceitunas negras y jitomate.</p>
+                <button class="mn-btn-agregar" onclick="abrirPizzaModal('img/vegetariana.jpg', 'Pizza Vegetariana', 'Pimientos verdes, cebolla morada, champiñones frescos, aceitunas negras y jitomate sobre cama de queso.')">Ver detalles</button>
+              </div>
+            </article>
+
+            <article class="mn-card">
+              <div class="mn-card-img"><img src="img/jamon.jpg" alt="Clásica de Jamón"></div>
+              <div class="mn-card-body">
+                <div class="mn-card-top"><h3>Clásica de Jamón</h3><span class="mn-precio">$169</span></div>
+                <p>La favorita de todos. Doble porción de jamón de pierna y una generosa capa de queso.</p>
+                <button class="mn-btn-agregar" onclick="abrirPizzaModal('img/jamon.jpg', 'Pizza Clásica de Jamón', 'La favorita de todos. Doble porción de jamón de pierna y una generosa capa de queso artesanal.')">Ver detalles</button>
+              </div>
+            </article>
+
+            <article class="mn-card">
+              <div class="mn-card-img"><img src="img/pepperoni.png" alt="Pepperoni"></div>
+              <div class="mn-card-body">
+                <div class="mn-card-top"><h3>Pepperoni Especial</h3><span class="mn-precio">$199</span></div>
+                <p>Pepperoni americano de alta calidad, ligeramente crujiente con toque de chile y orégano.</p>
+                <button class="mn-btn-agregar" onclick="abrirPizzaModal('img/pepperoni.png', 'Pizza Pepperoni Especial', 'Pepperoni americano de alta calidad, ligeramente crujiente, con un toque de chile y orégano.')">Ver detalles</button>
+              </div>
+            </article>
+
+            <article class="mn-card">
+              <div class="mn-card-img"><img src="img/mexicana.png" alt="Mexicana"></div>
+              <div class="mn-card-body">
+                <div class="mn-card-top"><h3>Mexicana</h3><span class="mn-precio">$219</span></div>
+                <p>Chorizo artesanal, jalapeños, frijoles refritos, cebolla y toque de cilantro fresco.</p>
+                <button class="mn-btn-agregar" onclick="abrirPizzaModal('img/mexicana.png', 'Pizza Mexicana', 'Chorizo artesanal, jalapeños, frijoles refritos, cebolla y un toque de cilantro fresco sobre masa crujiente.')">Ver detalles</button>
+              </div>
+            </article>
+
+            <article class="mn-card">
+              <div class="mn-card-img"><img src="img/carnes.png" alt="Carnes Frías"></div>
+              <div class="mn-card-body">
+                <div class="mn-card-top"><h3>Carnes Frías</h3><span class="mn-precio">$239</span></div>
+                <p>Para los amantes de la carne: jamón, pepperoni, salchicha italiana y tocino ahumado.</p>
+                <button class="mn-btn-agregar" onclick="abrirPizzaModal('img/carnes.png', 'Pizza Carnes Frías', 'Para los amantes de la carne: jamón, pepperoni, salchicha italiana y tocino ahumado sobre extra queso mozzarella.')">Ver detalles</button>
+              </div>
+            </article>
+
+          </div>
+
+        <!-- BEBIDAS -->
+        <div class="mn-categoria" id="cat-bebidas" style="display:none">
+          <div class="mn-titulo"><span>🥤</span> Bebidas</div>
+          <div class="mn-grid" id="grid-bebidas">
+            <div class="mn-loading">Cargando bebidas...</div>
+          </div>
+        </div>
+
+        <!-- EXTRAS -->
+        <div class="mn-categoria" id="cat-extras" style="display:none">
+          <div class="mn-titulo"><span>🍟</span> Extras</div>
+          <div class="mn-grid" id="grid-extras">
+            <div class="mn-loading">Cargando extras...</div>
+          </div>
+        </div>
+
+
+
+      </div>
+    </section>
+
+
+    <!-- PERSONALIZAR -->
+    <section id="personalizar" class="seccion">
+
+      <div class="ps-hero">
+        <img src="img/pizza.png" alt="Pizza" class="ps-hero-img">
+        <div class="ps-hero-overlay">
+          <h2>Crea tu Masterpiece</h2>
+          <p>Elige tamaño, sabores y arma tu pizza perfecta</p>
+        </div>
+      </div>
+
+      <div class="ps-layout">
+
+        <!-- COLUMNA IZQUIERDA: PREVIEW -->
+        <div class="ps-preview-col">
+          <div class="ps-pizza-preview" id="psPreviewBox">
+            <div class="ps-mitades" id="psMitades">
+              <div class="ps-mitad ps-mitad-1" id="psMitad1">
+                <img id="psImg1" src="" alt="">
+                <span id="psLabel1">?</span>
+              </div>
+              <div class="ps-mitad ps-mitad-2" id="psMitad2">
+                <img id="psImg2" src="" alt="">
+                <span id="psLabel2">?</span>
+              </div>
+              <div class="ps-mitad ps-mitad-3" id="psMitad3" style="display:none">
+                <img id="psImg3" src="" alt="">
+                <span id="psLabel3">?</span>
+              </div>
+              <div class="ps-mitad ps-mitad-4" id="psMitad4" style="display:none">
+                <img id="psImg4" src="" alt="">
+                <span id="psLabel4">?</span>
+              </div>
+            </div>
+            <div class="ps-preview-nota">Vista previa de tu pizza personalizada</div>
+          </div>
+
+          <div class="ps-seleccion-actual">
+            <p id="psResumenTexto">Selecciona un tamaño para comenzar</p>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: OPCIONES -->
+        <div class="ps-opciones-col">
+
+          <!-- PASO 1: TAMAÑO -->
+          <div class="ps-paso">
+            <div class="ps-paso-titulo"><span class="ps-num">1</span> Elige el Tamaño</div>
+            <div class="ps-tamanos-grid">
+
+              <label class="ps-tam-opt ps-disabled">
+                <input type="radio" name="psTamano" value="pequeña" data-precio="99" data-slots="1" data-orilla="30" disabled>
+                <div class="ps-tam-card">
+                  <div class="ps-tam-icon">6"</div>
+                  <strong>Pequeña</strong>
+                  <span>$99</span>
+                  <small class="ps-no-aplica">No aplica</small>
+                </div>
+              </label>
+
+              <label class="ps-tam-opt">
+                <input type="radio" name="psTamano" value="mediana" data-precio="179" data-slots="2" data-orilla="50">
+                <div class="ps-tam-card">
+                  <div class="ps-tam-icon">8"</div>
+                  <strong>Mediana</strong>
+                  <span>$179</span>
+                  <small>2 sabores</small>
+                </div>
+              </label>
+
+              <label class="ps-tam-opt">
+                <input type="radio" name="psTamano" value="grande" data-precio="199" data-slots="2" data-orilla="70">
+                <div class="ps-tam-card">
+                  <div class="ps-tam-icon">12"</div>
+                  <strong>Grande</strong>
+                  <span>$199</span>
+                  <small>2 sabores</small>
+                </div>
+              </label>
+
+              <label class="ps-tam-opt">
+                <input type="radio" name="psTamano" value="familiar" data-precio="299" data-slots="4" data-orilla="100">
+                <div class="ps-tam-card">
+                  <div class="ps-tam-icon">14"</div>
+                  <strong>Familiar</strong>
+                  <span>$299</span>
+                  <small>4 sabores</small>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- PASO 2: ORILLA -->
+          <div class="ps-paso">
+            <div class="ps-paso-titulo"><span class="ps-num">2</span> Estilo de Orilla</div>
+            <div class="ps-orillas-list">
+              <label class="ps-orilla-opt2">
+                <input type="radio" name="psOrilla" value="0" checked>
+                <div class="ps-orilla-card2">
+                  <div class="ps-orilla-txt"><strong>Tradicional</strong><small>Masa clásica horneada a la piedra</small></div>
+                  <span>$0</span>
+                </div>
+              </label>
+              <label class="ps-orilla-opt2">
+                <input type="radio" name="psOrilla" value="45">
+                <div class="ps-orilla-card2">
+                  <div class="ps-orilla-txt"><strong>Orilla de Queso</strong><small>Rellena de mozzarella premium fundido</small></div>
+                  <span id="psOrillaPrecioLabel">+ $30</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- PASO 3: SABORES -->
+          <div class="ps-paso" id="psPasoSabores" style="opacity:0.4; pointer-events:none">
+            <div class="ps-paso-titulo"><span class="ps-num">3</span> Elige tus Sabores <span id="psSaboresInfo" class="ps-info-badge">Selecciona tamaño primero</span></div>
+            <div class="ps-sabores-grid" id="psSaboresGrid">
+
+              <div class="ps-sabor-slot" id="psSlot1" data-slot="1">
+                <div class="ps-sabor-titulo">Sección 1</div>
+                <div class="ps-sabor-opciones">
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor1" value="Hawaiana" data-img="img/hawaiana.png"><div class="ps-sabor-card"><img src="img/hawaiana.png" alt=""><span>Hawaiana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor1" value="Vegetariana" data-img="img/vegetariana.jpg"><div class="ps-sabor-card"><img src="img/vegetariana.jpg" alt=""><span>Vegetariana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor1" value="Jamón" data-img="img/jamon.jpg"><div class="ps-sabor-card"><img src="img/jamon.jpg" alt=""><span>Jamón</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor1" value="Pepperoni" data-img="img/pepperoni.png"><div class="ps-sabor-card"><img src="img/pepperoni.png" alt=""><span>Pepperoni</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor1" value="Mexicana" data-img="img/mexicana.png"><div class="ps-sabor-card"><img src="img/mexicana.png" alt=""><span>Mexicana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor1" value="Carnes Frías" data-img="img/carnes.png"><div class="ps-sabor-card"><img src="img/carnes.png" alt=""><span>Carnes Frías</span></div></label>
+                </div>
+              </div>
+
+              <div class="ps-sabor-slot" id="psSlot2" data-slot="2">
+                <div class="ps-sabor-titulo">Sección 2</div>
+                <div class="ps-sabor-opciones">
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor2" value="Hawaiana" data-img="img/hawaiana.png"><div class="ps-sabor-card"><img src="img/hawaiana.png" alt=""><span>Hawaiana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor2" value="Vegetariana" data-img="img/vegetariana.jpg"><div class="ps-sabor-card"><img src="img/vegetariana.jpg" alt=""><span>Vegetariana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor2" value="Jamón" data-img="img/jamon.jpg"><div class="ps-sabor-card"><img src="img/jamon.jpg" alt=""><span>Jamón</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor2" value="Pepperoni" data-img="img/pepperoni.png"><div class="ps-sabor-card"><img src="img/pepperoni.png" alt=""><span>Pepperoni</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor2" value="Mexicana" data-img="img/mexicana.png"><div class="ps-sabor-card"><img src="img/mexicana.png" alt=""><span>Mexicana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor2" value="Carnes Frías" data-img="img/carnes.png"><div class="ps-sabor-card"><img src="img/carnes.png" alt=""><span>Carnes Frías</span></div></label>
+                </div>
+              </div>
+
+              <div class="ps-sabor-slot" id="psSlot3" data-slot="3" style="display:none">
+                <div class="ps-sabor-titulo">Sección 3</div>
+                <div class="ps-sabor-opciones">
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor3" value="Hawaiana" data-img="img/hawaiana.png"><div class="ps-sabor-card"><img src="img/hawaiana.png" alt=""><span>Hawaiana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor3" value="Vegetariana" data-img="img/vegetariana.jpg"><div class="ps-sabor-card"><img src="img/vegetariana.jpg" alt=""><span>Vegetariana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor3" value="Jamón" data-img="img/jamon.jpg"><div class="ps-sabor-card"><img src="img/jamon.jpg" alt=""><span>Jamón</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor3" value="Pepperoni" data-img="img/pepperoni.png"><div class="ps-sabor-card"><img src="img/pepperoni.png" alt=""><span>Pepperoni</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor3" value="Mexicana" data-img="img/mexicana.png"><div class="ps-sabor-card"><img src="img/mexicana.png" alt=""><span>Mexicana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor3" value="Carnes Frías" data-img="img/carnes.png"><div class="ps-sabor-card"><img src="img/carnes.png" alt=""><span>Carnes Frías</span></div></label>
+                </div>
+              </div>
+
+              <div class="ps-sabor-slot" id="psSlot4" data-slot="4" style="display:none">
+                <div class="ps-sabor-titulo">Sección 4</div>
+                <div class="ps-sabor-opciones">
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor4" value="Hawaiana" data-img="img/hawaiana.png"><div class="ps-sabor-card"><img src="img/hawaiana.png" alt=""><span>Hawaiana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor4" value="Vegetariana" data-img="img/vegetariana.jpg"><div class="ps-sabor-card"><img src="img/vegetariana.jpg" alt=""><span>Vegetariana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor4" value="Jamón" data-img="img/jamon.jpg"><div class="ps-sabor-card"><img src="img/jamon.jpg" alt=""><span>Jamón</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor4" value="Pepperoni" data-img="img/pepperoni.png"><div class="ps-sabor-card"><img src="img/pepperoni.png" alt=""><span>Pepperoni</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor4" value="Mexicana" data-img="img/mexicana.png"><div class="ps-sabor-card"><img src="img/mexicana.png" alt=""><span>Mexicana</span></div></label>
+                  <label class="ps-sabor-opt"><input type="radio" name="psSabor4" value="Carnes Frías" data-img="img/carnes.png"><div class="ps-sabor-card"><img src="img/carnes.png" alt=""><span>Carnes Frías</span></div></label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- BARRA TOTAL Y AGREGAR -->
+          <div class="ps-barra-total">
+            <div class="ps-barra-info">
+              <small>TOTAL ESTIMADO</small>
+              <strong id="psTotalTexto">$0.00 MXN</strong>
+            </div>
+            <button class="ps-agregar-btn" onclick="agregarPizzaPersonalizada()">🛒 Agregar al Carrito</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CARRITO -->
+    <section id="carrito" class="seccion">
+
+      <div class="cr-page">
+        <div class="cr-header flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 class="cr-titulo">Tu Pedido</h2>
+            <p class="cr-subtitulo">Revisa tus productos antes de confirmar</p>
+          </div>
+          <button class="cr-vaciar-btn" onclick="vaciarCarrito()">🗑 Vaciar carrito</button>
+        </div>
+
+        <div class="cr-layout grid gap-6">
+
+          <!-- COLUMNA IZQUIERDA: PRODUCTOS -->
+          <div class="cr-col-productos">
+
+            <!-- Tabla cabecera -->
+            <div class="cr-tabla-header">
+              <span>Producto</span>
+              <span>Cantidad</span>
+              <span>Precio</span>
+            </div>
+
+            <!-- Estado vacío -->
+            <div id="carritoVacio" class="cr-vacio">
+              <div class="cr-vacio-icon">🛒</div>
+              <h4>Tu carrito está vacío</h4>
+              <p>Agrega pizzas, bebidas o extras para comenzar.</p>
+              <button class="cr-ir-menu" onclick="mostrarSeccion('menu')">Ver menú</button>
+            </div>
+
+            <!-- Lista dinámica -->
+            <ul id="listaCarrito" class="cr-lista"></ul>
+
+
+
+          </div>
+
+          <!-- COLUMNA DERECHA: RESUMEN -->
+          <div class="cr-col-resumen">
+            <div class="cr-resumen-card">
+              <h3 class="cr-resumen-titulo">Resumen del Pedido</h3>
+
+              <div class="cr-resumen-lineas">
+                <div class="cr-resumen-row"><span>Productos</span><span id="cantidadProductos">0</span></div>
+                <div class="cr-resumen-row"><span>Subtotal</span><span id="subtotal">$0</span></div>
+                <div class="cr-resumen-row"><span>Envío</span><span class="cr-gratis">Gratis</span></div>
+                <div class="cr-resumen-row cr-minimo"><span>Mínimo de pedido</span><span>$150</span></div>
+                <div class="cr-resumen-row" id="cuponDescuentoLinea" style="display:none;color:#22c55e"><span>🎟️ Cupón 20% OFF</span><span></span></div>
+              </div>
+
+              <div class="cr-resumen-divider"></div>
+
+              <div class="cr-resumen-total">
+                <span>Total</span>
+                <strong id="total">$0</strong>
+              </div>
+
+              <button class="cr-pedido-btn" onclick="realizarPedido()">Realizar Pedido →</button>
+              <button class="cr-seguir-btn" onclick="mostrarSeccion('menu')">Seguir comprando</button>
+
+              <div id="mensajeHorario" class="horario-aviso" style="display:none">
+                <span>⏰</span>
+                <div>
+                  <strong>Fuera de horario</strong>
+                  <p>Recibimos pedidos de <strong>4:00 PM a 11:00 PM</strong>. ¡Vuelve pronto!</p>
+                </div>
+              </div>
+
+              <div class="cr-nota">
+                <p>🕐 <strong>Tiempo estimado:</strong> 30–35 minutos</p>
+                <p>📞 <strong>Contacto:</strong> 958 128 3351 / 958 173 9835</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CUENTA -->
+    <section id="cuenta" class="seccion">
+      <div class="ct-page">
+
+        <!-- SIDEBAR -->
+        <aside class="ct-sidebar">
+          <div class="ct-perfil">
+            <div class="ct-avatar">👤</div>
+            <h3 id="ctNombreDisplay">Cliente</h3>
+            <p id="ctCorreoDisplay">—</p>
+            <button class="ct-edit-btn" onclick="ctMostrarPanel('info')">Editar perfil</button>
+          </div>
+
+          <nav class="ct-nav">
+            <button class="ct-nav-btn active" onclick="ctMostrarPanel('info')">
+              <span>👤</span> Información personal
+            </button>
+            <button class="ct-nav-btn" onclick="ctMostrarPanel('ubicacion')">
+              <span>📍</span> Dirección de entrega
+            </button>
+            <button class="ct-nav-btn" onclick="ctMostrarPanel('preferencias')">
+              <span>🎟️</span> Mis Cupones
+            </button>
+          </nav>
+
+          <button class="ct-logout-btn" onclick="cerrarSesion()">↩ Cerrar sesión</button>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="ct-contenido">
+
+          <!-- PANEL: INFO PERSONAL -->
+          <div class="ct-panel" id="ct-panel-info">
+
+            <!-- Pedidos recientes -->
+            <div class="ct-panel-header">
+              <div class="ct-panel-header-row">
+                <div>
+                  <h2>Pedidos Recientes</h2>
+                  <p>Historial y estado de tus órdenes</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ct-orders-table">
+              <div class="ct-orders-thead">
+                <span>ID</span>
+                <span>Fecha</span>
+                <span>Estado</span>
+                <span>Total</span>
+                <span>Acciones</span>
+              </div>
+              <div id="ctOrdersBody" class="ct-orders-body">
+                <div class="ct-orders-vacio">No tienes pedidos registrados aún.</div>
+              </div>
+            </div>
+
+            <!-- Info personal debajo -->
+            <div class="ct-panel-header" style="margin-top:36px">
+              <h2>Información Personal</h2>
+              <p>Actualiza tus datos de contacto</p>
+            </div>
+            <div class="ct-form">
+              <div class="ct-fields-row">
+                <div class="ct-field">
+                  <label>Nombre completo</label>
+                  <input type="text" id="nombreCuentaTexto" placeholder="Tu nombre completo" readonly>
+                </div>
+                <div class="ct-field">
+                  <label>Número telefónico</label>
+                  <input type="text" id="telefonoCuenta" placeholder="Ingresa tu número">
+                </div>
+              </div>
+              <div class="ct-field">
+                <label>Correo electrónico</label>
+                <input type="email" id="correoCuenta" placeholder="Ingresa tu correo electrónico">
+              </div>
+              <button class="ct-save-btn" onclick="guardarDatosCuenta()">Guardar cambios</button>
+            </div>
+
+            <div class="ct-estado-card">
+              <h4>Estado de la cuenta</h4>
+              <div class="ct-estado-rows">
+                <div class="ct-estado-row"><span>Estado</span><strong class="ct-activo">● Activa</strong></div>
+                <div class="ct-estado-row"><span>Tipo de usuario</span><strong>Cliente PizzaGo</strong></div>
+                <div class="ct-estado-row"><span>Productos en carrito</span><strong id="resumenCuentaCarrito">0</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL: UBICACIÓN -->
+          <div class="ct-panel" id="ct-panel-ubicacion" style="display:none">
+            <div class="ct-panel-header">
+              <h2>Dirección de Entrega</h2>
+              <p>Registra tu ubicación para recibir tu pedido</p>
+            </div>
+            <div class="ct-ubicacion-card">
+              <div class="ct-ubi-header">
+                <span>🏠 <strong>Principal</strong></span>
+                <span class="ct-default-badge">Predeterminada</span>
+              </div>
+              <div class="ct-ubi-coords">
+                <p>📍 <strong>Latitud:</strong> <span id="latitudCliente">No registrada</span></p>
+                <p>📍 <strong>Longitud:</strong> <span id="longitudCliente">No registrada</span></p>
+              </div>
+              <div id="direccionGuardada" class="ct-direccion-texto"></div>
+            </div>
+            <div class="ct-form">
+              <button class="ct-gps-btn" onclick="obtenerUbicacionActual()">📡 Usar mi ubicación actual (GPS)</button>
+              <div class="ct-field">
+                <label>Referencias adicionales</label>
+                <textarea id="direccion" placeholder="Calle, número, colonia, referencias para el repartidor..."></textarea>
+              </div>
+              <button class="ct-save-btn" onclick="guardarDireccion()">Guardar ubicación</button>
+            </div>
+          </div>
+
+          <!-- PANEL: PREFERENCIAS -->
+          <div class="ct-panel" id="ct-panel-preferencias" style="display:none">
+            <div class="ct-panel-header">
+              <h2>Mis Cupones</h2>
+              <p>Tus descuentos y promociones exclusivas</p>
+            </div>
+
+            <!-- Cupón de bienvenida -->
+            <div id="ctCuponBienvenida" class="ct-cupon-wrap"></div>
+
+            <!-- Cupones usados / info -->
+            <div class="ct-cupon-info">
+              <h4>¿Cómo funcionan los cupones?</h4>
+              <ul class="ct-cupon-reglas">
+                <li>🍕 Aplica desde <strong>Pizza Mediana</strong> en adelante</li>
+                <li>🎉 El cupón de bienvenida da <strong>20% de descuento</strong></li>
+                <li>⏳ Cada cupón es de <strong>un solo uso</strong></li>
+                <li>🛒 Se aplica automáticamente al realizar tu pedido</li>
+              </ul>
+            </div>
+
+            <!-- Campo para ingresar cupón manual -->
+            <div class="ct-cupon-form">
+              <h4>¿Tienes un código de cupón?</h4>
+              <div class="ct-cupon-input-row">
+                <input type="text" id="ctCuponInput" placeholder="Ej: A1234BCDE" maxlength="9">
+                <button onclick="ctAplicarCupon()">Aplicar</button>
+              </div>
+              <p id="ctCuponMensaje" class="ct-cupon-msg"></p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- MODAL DETALLE PEDIDO — fuera de la sección para que siempre sea visible -->
+    <div id="ctPedidoModal" class="ct-modal-overlay" onclick="ctCerrarModal(event)">
+      <div class="ct-modal" id="ctPedidoModalBox"></div>
+    </div>
+
+  <!-- MODAL CUPÓN AL PEDIR -->
+  <div id="modalCuponPedido" class="mcp-overlay" onclick="mcpOverlayClick(event)">
+    <div class="mcp-box">
+      <button class="mcp-close" onclick="document.getElementById('modalCuponPedido').classList.remove('visible')">✕</button>
+      <div class="mcp-icon">🎟️</div>
+      <h3>¿Tienes un cupón de descuento?</h3>
+      <div id="modalCuponCuerpo"></div>
+    </div>
+  </div>
+  <div id="modalSesion" class="ms-overlay" onclick="msOverlayClick(event)">
+    <div class="ms-box">
+      <div class="ms-box-icon">🔒</div>
+      <h3>Inicia sesión para continuar</h3>
+      <p>Necesitas una cuenta para agregar productos al carrito y realizar pedidos.</p>
+      <div class="ms-box-btns">
+        <a href="./inicio.html" class="ms-box-btn-primary">Iniciar sesión</a>
+        <a href="./inicio.html" class="ms-box-btn-secondary">Crear cuenta</a>
+      </div>
+      <button class="ms-box-close" onclick="cerrarModalSesion()">Continuar sin cuenta →</button>
+    </div>
+  </div>
+
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- MODAL DETALLE PIZZA -->
+  <div id="pizzaModal" class="pz-modal-overlay" onclick="cerrarPizzaModal(event)">
+    <div class="pz-modal">
+      <button class="pz-close" onclick="cerrarPizzaModal()">✕</button>
+
+      <div class="pz-layout">
+
+        <!-- IMAGEN -->
+        <div class="pz-img-col">
+          <div class="pz-img-main">
+            <img id="pzImgPrincipal" src="" alt="">
+          </div>
+        </div>
+
+        <!-- INFO -->
+        <div class="pz-info-col">
+          <div class="pz-badges">
+            <span class="pz-badge-popular">POPULAR</span>
+          </div>
+          <h2 id="pzNombre" class="pz-nombre"></h2>
+          <p id="pzDesc" class="pz-desc"></p>
+
+          <!-- TAMAÑO -->
+          <div class="pz-seccion">
+            <div class="pz-seccion-titulo">🍕 Tamaño de Pizza</div>
+            <div class="pz-tamanos">
+              <label class="pz-tamano-opt">
+                <input type="radio" name="pzTamano" value="99" data-label="Chica" data-orilla="30" checked>
+                <div class="pz-tamano-card">
+                  <small>PERSONAL</small>
+                  <strong>Chica</strong>
+                  <span>$99 MXN</span>
+                </div>
+              </label>
+              <label class="pz-tamano-opt">
+                <input type="radio" name="pzTamano" value="179" data-label="Mediana" data-orilla="50">
+                <div class="pz-tamano-card">
+                  <small>FAMILIAR</small>
+                  <strong>Mediana</strong>
+                  <span>$179 MXN</span>
+                </div>
+              </label>
+              <label class="pz-tamano-opt">
+                <input type="radio" name="pzTamano" value="199" data-label="Grande" data-orilla="70">
+                <div class="pz-tamano-card">
+                  <small>FIESTA</small>
+                  <strong>Grande</strong>
+                  <span>$199 MXN</span>
+                </div>
+              </label>
+              <label class="pz-tamano-opt">
+                <input type="radio" name="pzTamano" value="299" data-label="Familiar" data-orilla="100">
+                <div class="pz-tamano-card">
+                  <small>MEGA</small>
+                  <strong>Familiar</strong>
+                  <span>$299 MXN</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- ORILLA -->
+          <div class="pz-seccion">
+            <div class="pz-seccion-titulo">🟡 Orilla de Queso</div>
+            <div class="pz-orillas">
+              <label class="pz-orilla-opt">
+                <input type="radio" name="pzOrilla" value="0" checked>
+                <div class="pz-orilla-card">
+                  <div class="pz-orilla-info">
+                    <strong>Tradicional</strong>
+                    <small>Masa clásica horneada a la piedra</small>
+                  </div>
+                  <span class="pz-orilla-precio">$0</span>
+                </div>
+              </label>
+              <label class="pz-orilla-opt">
+                <input type="radio" name="pzOrilla" value="orilla">
+                <div class="pz-orilla-card">
+                  <div class="pz-orilla-info">
+                    <strong>Orilla de Queso Original</strong>
+                    <small>Rellena de mozzarella premium fundido</small>
+                  </div>
+                  <span class="pz-orilla-precio" id="pzOrillaPrecioLabel">+ $30</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- FOOTER TOTAL + AGREGAR -->
+          <div class="pz-footer">
+            <div class="pz-cantidad">
+              <button onclick="cambiarCantidadModal(-1)">−</button>
+              <span id="pzCantidad">1</span>
+              <button onclick="cambiarCantidadModal(1)">+</button>
+            </div>
+            <div class="pz-total-box">
+              <small>TOTAL ESTIMADO</small>
+              <strong id="pzTotal">$99.00 MXN</strong>
+            </div>
+            <button class="pz-agregar-btn" onclick="agregarDesdeModal()">🛒 Agregar al Carrito</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner grid gap-8">
+
+      <div class="footer-col footer-brand">
+        <div class="footer-logo">🍕 PizzaGo</div>
+        <p>La mejor pizza artesanal de la región, horneada al momento con los ingredientes más frescos del mercado.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Menú</h4>
+        <ul>
+          <li><a onclick="cambiarCategoriaMenu('pizzas', document.querySelector('.mn-tab')); mostrarSeccion('menu')">Pizzas</a></li>
+          <li><a onclick="cambiarCategoriaMenu('bebidas', document.querySelectorAll('.mn-tab')[1]); mostrarSeccion('menu')">Bebidas</a></li>
+          <li><a onclick="cambiarCategoriaMenu('extras', document.querySelectorAll('.mn-tab')[2]); mostrarSeccion('menu')">Extras</a></li>
+          <li><a onclick="cambiarCategoriaMenu('complementos', document.querySelectorAll('.mn-tab')[3]); mostrarSeccion('menu')">Complementos</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Atención</h4>
+        <ul>
+          <li><a>Preguntas Frecuentes</a></li>
+          <li><a>Términos y Condiciones</a></li>
+          <li><a>Política de Privacidad</a></li>
+          <li><a>Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="footer-social">
+          <a class="social-btn" title="Facebook" href="https://www.facebook.com/pizzago" target="_blank"><img src="img/face.png" alt="Facebook"></a>
+          <a class="social-btn" title="Instagram" href="https://www.instagram.com/pizzago" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+          <a class="social-btn" title="WhatsApp" href="https://wa.me/529581283351" target="_blank"><img src="img/what.png" alt="WhatsApp"></a>
+        </div>
+      </div>
+
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 PizzaGo. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/strapi.js"></script>
+  <script src="js/Cliente.js"></script>
+</body>
+</html>
