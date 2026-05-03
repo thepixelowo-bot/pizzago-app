@@ -20,13 +20,11 @@ function estaEnHorario() {
 }
 
 function mostrarSeccion(id, boton = null) {
-  // Mostrar u ocultar aviso de horario al entrar al carrito
   if (id === "carrito") {
     const mensajeHorario = document.getElementById("mensajeHorario")
     if (mensajeHorario) mensajeHorario.style.display = estaEnHorario() ? "none" : "flex"
   }
 
-  // Ocultar nav-tabs en bienvenida, mostrar en las demás secciones
   const navTabs = document.querySelector(".nav-tabs")
   if (navTabs) navTabs.style.display = id === "bienvenida" ? "none" : "flex"
   document.querySelectorAll(".seccion").forEach(sec => {
@@ -211,7 +209,6 @@ function mostrarModalSesion(nombre, precio) {
 
 function cerrarModalSesion() {
   document.getElementById('modalSesion').classList.remove('visible')
-  // Si cierra sin iniciar sesión, agrega igual el producto
   if (_pendingNombre !== null) {
     _agregarCarritoDirecto(_pendingNombre, _pendingPrecio)
     _pendingNombre = null
@@ -279,7 +276,6 @@ function actualizarCarrito() {
   if (subtotalElemento) subtotalElemento.textContent = `$${subtotal}`
   const totalConDescuento = aplicarDescuentoCupon ? aplicarDescuentoCupon(subtotal) : subtotal
   if (totalElemento) totalElemento.textContent = `$${totalConDescuento}`
-  // Mostrar línea de descuento si hay cupón activo
   const descEl = document.getElementById('cuponDescuentoLinea')
   if (descEl) {
     if (totalConDescuento < subtotal) {
@@ -297,7 +293,6 @@ function actualizarCarrito() {
 }
 
 function cambiarCantidadCarrito(index, delta) {
-  // Por ahora solo elimina si baja a 0 (cada item es unitario)
   if (delta < 0) eliminarDelCarrito(index)
 }
 
@@ -328,22 +323,35 @@ function guardarDatosCuenta() {
   mostrarToast("Tus datos de cuenta se guardaron correctamente")
 }
 
+// =====================
+// UBICACIÓN CON DIRECCIÓN LEGIBLE
+// =====================
 function obtenerUbicacionActual() {
   if (!navigator.geolocation) { mostrarToast("Tu navegador no permite obtener la ubicación"); return }
   navigator.geolocation.getCurrentPosition(
-    posicion => {
+    async posicion => {
       const latitud = posicion.coords.latitude.toFixed(6)
       const longitud = posicion.coords.longitude.toFixed(6)
       localStorage.setItem("latitudCliente", latitud)
       localStorage.setItem("longitudCliente", longitud)
-      const latitudTexto = document.getElementById("latitudCliente")
-      const longitudTexto = document.getElementById("longitudCliente")
-      const direccion = document.getElementById("direccion")
-      if (latitudTexto) latitudTexto.textContent = latitud
-      if (longitudTexto) longitudTexto.textContent = longitud
-      if (direccion && direccion.value.trim() === "") {
-        direccion.value = `Ubicación detectada. Latitud: ${latitud}, Longitud: ${longitud}`
+
+      // Convertir coordenadas a dirección legible
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitud}&lon=${longitud}&format=json`)
+        const data = await res.json()
+        const direccionLegible = data.display_name || `Lat: ${latitud}, Lon: ${longitud}`
+        localStorage.setItem("direccion", direccionLegible)
+
+        const direccionInput = document.getElementById("direccion")
+        const direccionGuardada = document.getElementById("direccionGuardada")
+        if (direccionInput) direccionInput.value = direccionLegible
+        if (direccionGuardada) direccionGuardada.textContent = "Ubicación guardada: " + direccionLegible
+      } catch {
+        const fallback = `Lat: ${latitud}, Lon: ${longitud}`
+        const direccionInput = document.getElementById("direccion")
+        if (direccionInput) direccionInput.value = fallback
       }
+
       mostrarToast("Ubicación actual obtenida correctamente")
     },
     () => { mostrarToast("No se pudo obtener tu ubicación") }
@@ -360,7 +368,6 @@ function guardarDireccion() {
   if (direccionGuardada) direccionGuardada.textContent = "Ubicación guardada: " + direccion
   mostrarToast("Tu ubicación se guardó correctamente")
 }
-
 
 function obtenerPedidosActivosIds() {
   return JSON.parse(localStorage.getItem("pedidosActivosIds")) || []
@@ -487,7 +494,6 @@ async function obtenerEstadoPedidoActual() {
   }
   try {
     const pedidos = await sbObtenerPedidosPorIds(idsActivos)
-    // Verificar cambio de estado para notificaciones
     if (pedidos.length > 0) {
       const ultimo = pedidos[pedidos.length - 1]
       if (_ultimoEstadoNotif !== null && ultimo.estado !== _ultimoEstadoNotif) {
@@ -503,7 +509,6 @@ async function obtenerEstadoPedidoActual() {
 }
 
 function realizarPedido() {
-  // 1. Validar horario
   const horaActual = new Date().getHours()
   if (horaActual < 16 || horaActual >= 23) {
     mostrarToast("⏰ Solo recibimos pedidos de 4:00 PM a 11:00 PM")
@@ -523,14 +528,12 @@ function realizarPedido() {
     return
   }
 
-  // 2. Verificar sesión — si no hay clienteId, redirigir a inicio
   const clienteId = localStorage.getItem('clienteId')
   if (!clienteId) {
     document.getElementById('modalSesion').classList.add('visible')
     return
   }
 
-  // 3. Verificar dirección
   const direccionCliente = localStorage.getItem("direccion") || ""
   if (!direccionCliente.trim()) {
     mostrarToast("Primero guarda tu ubicación en Mi cuenta")
@@ -538,7 +541,6 @@ function realizarPedido() {
     return
   }
 
-  // 4. Mostrar modal de cupón antes de confirmar
   mostrarModalCupon()
 }
 
@@ -551,7 +553,6 @@ function mostrarModalCupon() {
   const cuerpo = document.getElementById('modalCuponCuerpo')
 
   if (tieneCuponActivo) {
-    // Ya tiene cupón disponible
     cuerpo.innerHTML = `
       <p class="mcp-subtitle">¡Tienes un cupón disponible!</p>
       <div class="mcp-ticket">
@@ -572,7 +573,6 @@ function mostrarModalCupon() {
         <button class="mcp-btn-sin" onclick="confirmarSinCupon()">Continuar sin cupón</button>
       </div>`
   } else {
-    // No tiene cupón o ya lo usó — pedir código manual
     cuerpo.innerHTML = `
       <p class="mcp-subtitle">¿Tienes un código de cupón de la sucursal?</p>
       <div class="mcp-input-row">
@@ -644,10 +644,8 @@ async function _ejecutarPedido() {
   }
 
   try {
-    // Guardar en Supabase
     const pedidoId = await sbCrearPedido(pedidoData)
 
-    // Guardar ID localmente para tracking
     const idsActivos = obtenerPedidosActivosIds()
     idsActivos.push(pedidoId)
     guardarPedidosActivosIds(idsActivos)
@@ -703,7 +701,70 @@ window.addEventListener("storage", e => {
   }
 })
 
+// =====================
+// MANEJO SESIÓN GOOGLE EN CLIENTE
+// =====================
+async function manejarSesionGoogleEnCliente() {
+  const hash = window.location.hash
+  if (!hash || !hash.includes('access_token')) return
+
+  const params = new URLSearchParams(hash.substring(1))
+  const accessToken = params.get('access_token')
+  if (!accessToken) return
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${accessToken}` }
+    })
+    const user = await res.json()
+    if (!user || !user.email) return
+
+    const check = await fetch(
+      `${SUPABASE_URL}/rest/v1/clientes?correo=eq.${encodeURIComponent(user.email)}&select=*`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    )
+    const existe = await check.json()
+
+    let cliente
+    if (existe && existe.length > 0) {
+      cliente = existe[0]
+    } else {
+      const nombre = user.user_metadata?.full_name || user.email.split('@')[0]
+      const crearRes = await fetch(`${SUPABASE_URL}/rest/v1/clientes`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({ nombre, correo: user.email, password: '', telefono: '', cupon: '', cupon_usado: false })
+      })
+      const data = await crearRes.json()
+      cliente = data[0]
+      const codigo = generarCodigoCupon()
+      localStorage.setItem('cuponBienvenida', JSON.stringify({ codigo, usado: false, descuento: 20 }))
+    }
+
+    localStorage.setItem('clienteId',        cliente.id)
+    localStorage.setItem('nombreCliente',    cliente.nombre)
+    localStorage.setItem('usuarioCliente',   cliente.correo)
+    localStorage.setItem('correoCliente',    cliente.correo)
+    localStorage.setItem('telefonoCliente',  cliente.telefono || '')
+    localStorage.setItem('clienteRegistrado','true')
+
+    // Limpiar el hash de la URL
+    window.history.replaceState(null, '', window.location.pathname)
+
+  } catch (err) {
+    console.error('Error manejando sesión Google:', err)
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+  // ─── PRIMERO: manejar sesión de Google si viene en el hash ───
+  await manejarSesionGoogleEnCliente()
+
   // Cargar pedidos del cliente desde Supabase al iniciar
   const clienteNombre = localStorage.getItem("nombreCliente")
   if (clienteNombre) {
@@ -721,8 +782,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const correo = localStorage.getItem("correoCliente") || ""
   const telefono = localStorage.getItem("telefonoCliente") || usuario
   const direccion = localStorage.getItem("direccion") || ""
-  const latitud = localStorage.getItem("latitudCliente") || "No registrada"
-  const longitud = localStorage.getItem("longitudCliente") || "No registrada"
 
   const nombreUsuario = document.getElementById("nombreUsuario")
   const nombreCuentaTexto = document.getElementById("nombreCuentaTexto")
@@ -730,8 +789,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const telefonoCuenta = document.getElementById("telefonoCuenta")
   const direccionInput = document.getElementById("direccion")
   const direccionGuardada = document.getElementById("direccionGuardada")
-  const latitudTexto = document.getElementById("latitudCliente")
-  const longitudTexto = document.getElementById("longitudCliente")
 
   if (nombreUsuario) nombreUsuario.textContent = nombre
   if (nombreCuentaTexto) nombreCuentaTexto.value = nombre
@@ -739,14 +796,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (telefonoCuenta) telefonoCuenta.value = telefono
   if (direccionInput) direccionInput.value = direccion
   if (direccionGuardada && direccion !== "") direccionGuardada.textContent = "Ubicación guardada: " + direccion
-  if (latitudTexto) latitudTexto.textContent = latitud
-  if (longitudTexto) longitudTexto.textContent = longitud
 
-  // Ocultar nav al iniciar en bienvenida
   const navTabs = document.querySelector(".nav-tabs")
   if (navTabs) navTabs.style.display = "none"
 
-  // Saludo según hora del día
   const hora = new Date().getHours()
   const saludoEl = document.getElementById("saludoTiempo")
   const nombreBienvenida = document.getElementById("nombreBienvenida")
@@ -775,13 +828,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 // TABS MENÚ
 // =====================
 function cambiarCategoriaMenu(categoria, boton) {
-  // Ocultar todas las categorías
   document.querySelectorAll('.mn-categoria').forEach(el => el.style.display = 'none')
-  // Desactivar todas las pestañas
   document.querySelectorAll('.mn-tab').forEach(el => el.classList.remove('active'))
-  // Mostrar la categoría seleccionada
   document.getElementById('cat-' + categoria).style.display = 'block'
-  // Activar pestaña
   boton.classList.add('active')
 }
 
@@ -800,7 +849,6 @@ function abrirPizzaModal(img, nombre, desc) {
   document.getElementById('pzDesc').textContent = desc
   document.getElementById('pzCantidad').textContent = 1
 
-  // Reset selecciones
   document.querySelector('input[name="pzTamano"][value="99"]').checked = true
   document.querySelector('input[name="pzOrilla"][value="0"]').checked = true
 
@@ -820,10 +868,8 @@ function actualizarTotalModal() {
   const tamano = parseInt(tamanoInput.value) || 99
   const orillaCosto = parseInt(tamanoInput.dataset.orilla) || 30
   const orilaOpt = document.querySelector('input[name="pzOrilla"]:checked')
-  // Si eligió orilla de queso, cobrar el precio según tamaño; si es tradicional = 0
   const orilla = (orilaOpt && orilaOpt.value === 'orilla') ? orillaCosto : 0
 
-  // Actualizar etiqueta de precio de orilla
   const label = document.getElementById('pzOrillaPrecioLabel')
   if (label) label.textContent = '+ $' + orillaCosto
 
@@ -857,7 +903,6 @@ function agregarDesdeModal() {
   document.body.style.overflow = ''
 }
 
-// Actualizar total al cambiar opciones
 document.addEventListener('change', function(e) {
   if (e.target.name === 'pzTamano' || e.target.name === 'pzOrilla') {
     actualizarTotalModal()
@@ -871,13 +916,11 @@ let psSlots = 2
 let psPrecioBase = 0
 
 document.addEventListener('change', function(e) {
-  // Cambio de tamaño
   if (e.target.name === 'psTamano') {
     const input = e.target
     psSlots = parseInt(input.dataset.slots)
     psPrecioBase = parseInt(input.dataset.precio)
 
-    // Mostrar/ocultar slots
     for (let i = 1; i <= 4; i++) {
       const slot = document.getElementById('psSlot' + i)
       const mitad = document.getElementById('psMitad' + i)
@@ -885,14 +928,12 @@ document.addEventListener('change', function(e) {
       if (mitad) mitad.style.display = i <= psSlots ? 'block' : 'none'
     }
 
-    // Ajustar grid de mitades
     const mitadesBox = document.getElementById('psMitades')
     if (mitadesBox) {
       mitadesBox.style.gridTemplateColumns = psSlots === 4 ? 'repeat(2,1fr)' : 'repeat(2,1fr)'
       mitadesBox.dataset.slots = psSlots
     }
 
-    // Habilitar paso sabores
     const paso = document.getElementById('psPasoSabores')
     if (paso) { paso.style.opacity = '1'; paso.style.pointerEvents = 'all' }
     const badge = document.getElementById('psSaboresInfo')
@@ -901,10 +942,8 @@ document.addEventListener('change', function(e) {
     actualizarResumenPs()
   }
 
-  // Cambio de orilla
   if (e.target.name === 'psOrilla') actualizarResumenPs()
 
-  // Cambio de sabor
   if (e.target.name && e.target.name.startsWith('psSabor')) {
     const slot = parseInt(e.target.name.replace('psSabor',''))
     const img = e.target.dataset.img
@@ -924,7 +963,6 @@ function actualizarResumenPs() {
   const tieneOrilla = orilaOpt && parseInt(orilaOpt.value) > 0
   const orilla = tieneOrilla ? orillaCosto : 0
 
-  // Actualizar etiqueta de precio de orilla en el HTML
   const psOrillaLabel = document.getElementById('psOrillaPrecioLabel')
   if (psOrillaLabel) psOrillaLabel.textContent = '+ $' + orillaCosto
 
@@ -932,7 +970,6 @@ function actualizarResumenPs() {
   const totalEl = document.getElementById('psTotalTexto')
   if (totalEl) totalEl.textContent = total > 0 ? '$' + total.toFixed(2) + ' MXN' : '$0.00 MXN'
 
-  // Resumen texto
   const sabores = []
   for (let i = 1; i <= psSlots; i++) {
     const sel = document.querySelector(`input[name="psSabor${i}"]:checked`)
@@ -945,29 +982,6 @@ function actualizarResumenPs() {
       ? `Pizza ${tamanoNombre} · ${sabores.length}/${psSlots} sabores elegidos`
       : 'Selecciona un tamaño para comenzar'
   }
-}
-
-function agregarPizzaPersonalizada() {
-  const tamanoInput = document.querySelector('input[name="psTamano"]:checked')
-  if (!tamanoInput) { mostrarToast('Selecciona un tamaño primero'); return }
-
-  const sabores = []
-  for (let i = 1; i <= psSlots; i++) {
-    const sel = document.querySelector(`input[name="psSabor${i}"]:checked`)
-    if (!sel) { mostrarToast(`Elige el sabor para la sección ${i}`); return }
-    sabores.push(sel.value)
-  }
-
-  const orillaCosto = parseInt(tamanoInput.dataset.orilla || 0)
-  const orilaOpt = document.querySelector('input[name="psOrilla"]:checked')
-  const tieneOrilla = orilaOpt && parseInt(orilaOpt.value) > 0
-  const orilla = tieneOrilla ? orillaCosto : 0
-  const tamanoNombre = tamanoInput.value.charAt(0).toUpperCase() + tamanoInput.value.slice(1)
-  const precio = psPrecioBase + orilla
-  const nombre = `Pizza ${tamanoNombre} (${sabores.join(' / ')}${tieneOrilla ? ' + Orilla' : ''})`
-
-  agregarCarrito(nombre, precio)
-  mostrarSeccion('carrito')
 }
 
 // =====================
@@ -1088,11 +1102,9 @@ async function ctVerPedido(id) {
       </div>
       <button class="ct-modal-close" onclick="ctCerrarModalBtn()">✕</button>
     </div>
-
     <div class="pd-barra" style="margin:0 -28px;padding:20px 28px;background:rgba(255,255,255,0.015);border-bottom:1px solid rgba(255,255,255,0.06)">
       ${barraHtml}
     </div>
-
     <div class="ct-modal-body">
       <div class="ct-modal-col">
         <p class="ct-modal-section">Información del pedido</p>
@@ -1168,7 +1180,6 @@ function iniciarCarrusel() {
     dotsEl.appendChild(d)
   }
 
-  // Auto-avance cada 4s
   setInterval(() => {
     const maxIdx = total - 1
     carruselIdx = carruselIdx >= maxIdx ? 0 : carruselIdx + 1
@@ -1178,7 +1189,6 @@ function iniciarCarrusel() {
   }, 4000)
 }
 
-// Función agregar combo
 function agregarCombo(nombre, precio) {
   agregarCarrito(nombre, precio)
   mostrarToast('¡' + nombre + ' agregado al carrito!')
@@ -1197,7 +1207,6 @@ function generarCodigoCupon() {
 }
 
 function ctIniciarCupon() {
-  // Si no tiene cupón, generar uno al registrarse
   if (!localStorage.getItem('cuponBienvenida')) {
     const registrado = localStorage.getItem('clienteRegistrado') === 'true'
     if (registrado) {
@@ -1258,7 +1267,6 @@ function ctAplicarCupon() {
   if (val !== cupon.codigo) { msg.textContent = 'Código incorrecto'; msg.className = 'ct-cupon-msg err'; return }
   if (cupon.usado)          { msg.textContent = 'Este cupón ya fue utilizado'; msg.className = 'ct-cupon-msg err'; return }
 
-  // Guardar cupón activo para el pedido
   localStorage.setItem('cuponActivo', JSON.stringify(cupon))
   msg.textContent = `¡Cupón aplicado! 20% de descuento en tu próximo pedido 🎉`
   msg.className = 'ct-cupon-msg ok'
@@ -1266,7 +1274,6 @@ function ctAplicarCupon() {
   mostrarToast('¡Cupón de 20% aplicado! 🎉')
 }
 
-// Aplicar descuento del cupón al calcular total
 function aplicarDescuentoCupon(subtotalOriginal) {
   const raw = localStorage.getItem('cuponActivo')
   if (!raw) return subtotalOriginal
@@ -1274,7 +1281,6 @@ function aplicarDescuentoCupon(subtotalOriginal) {
   const cupon = JSON.parse(raw)
   if (cupon.usado) return subtotalOriginal
 
-  // Solo aplica si hay algún producto >= mediana en el carrito
   const tieneElegible = carrito.some(item => {
     const nombre = (item.nombre || '').toLowerCase()
     return nombre.includes('mediana') || nombre.includes('grande') || nombre.includes('familiar')
@@ -1285,7 +1291,6 @@ function aplicarDescuentoCupon(subtotalOriginal) {
   return Math.round(subtotalOriginal * (1 - cupon.descuento / 100))
 }
 
-// Marcar cupón como usado al realizar pedido
 function marcarCuponUsado() {
   const raw = localStorage.getItem('cuponActivo')
   if (!raw) return
