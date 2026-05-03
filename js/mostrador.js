@@ -23,6 +23,39 @@ function folio(idx) {
 }
 
 // ═══════════════════════════
+// NOTIFICACIONES
+// ═══════════════════════════
+let _notifPermiso = false
+let _pedidosIdsAnteriores = new Set()
+let _primeraCarga = true
+
+async function pedirPermisoNotificaciones() {
+  if (!("Notification" in window)) return
+  if (Notification.permission === "granted") {
+    _notifPermiso = true
+    return
+  }
+  if (Notification.permission !== "denied") {
+    const permiso = await Notification.requestPermission()
+    _notifPermiso = permiso === "granted"
+  }
+}
+
+function enviarNotificacionMostrador(titulo, cuerpo, icono = "🍕") {
+  if (!_notifPermiso || Notification.permission !== "granted") return
+  try {
+    new Notification(titulo, {
+      body: cuerpo,
+      icon: "img/logo.png",
+      badge: "img/logo.png",
+      tag: "pizzago-mostrador"
+    })
+  } catch (e) {
+    console.log("Notificación no disponible:", e)
+  }
+}
+
+// ═══════════════════════════
 // RENDER TARJETA
 // ═══════════════════════════
 function renderCard(pedido, idx) {
@@ -79,6 +112,23 @@ let _pedidosCache = []
 async function cargarPedidos() {
   try {
     const pedidos = await sbObtenerPedidos()
+
+    // Detectar pedidos nuevos (solo después de la primera carga)
+    if (!_primeraCarga) {
+      pedidos.forEach(p => {
+        if (!_pedidosIdsAnteriores.has(p.id) && p.estado === "Nuevo") {
+          enviarNotificacionMostrador(
+            "🍕 ¡Nuevo pedido!",
+            `${p.cliente} — $${p.total} — ${p.productos.length} producto(s)`
+          )
+          mostrarToast(`🍕 Nuevo pedido de ${p.cliente}`)
+        }
+      })
+    }
+
+    // Actualizar el set de IDs conocidos
+    _pedidosIdsAnteriores = new Set(pedidos.map(p => p.id))
+    _primeraCarga = false
     _pedidosCache = pedidos
 
     const nuevos     = pedidos.filter(p => p.estado === "Nuevo").length
@@ -98,6 +148,13 @@ async function cargarPedidos() {
     setText("tabPrep",            prep)
     setText("tabCamino",          camino)
     setText("tabEntregado",       entregados)
+
+    // Actualizar título de la pestaña del navegador
+    if (nuevos > 0) {
+      document.title = `(${nuevos} nuevos) PizzaGo | Panel`
+    } else {
+      document.title = "PizzaGo | Panel de Pedidos"
+    }
 
     let filtrados = [...pedidos]
     if (filtroActual !== "todos") {
@@ -263,10 +320,35 @@ function mostrarToast(msg) {
 }
 
 // ═══════════════════════════
+// SONIDO DE ALERTA
+// ═══════════════════════════
+function reproducirSonidoAlerta() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.frequency.setValueAtTime(880, ctx.currentTime)
+    osc.frequency.setValueAtTime(660, ctx.currentTime + 0.1)
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2)
+    gain.gain.setValueAtTime(0.3, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.4)
+  } catch (e) {
+    // Audio no disponible
+  }
+}
+
+// ═══════════════════════════
 // INIT
 // ═══════════════════════════
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   cargarAdminSidebar()
-  cargarPedidos()
-  setInterval(cargarPedidos, 8000)
+  await pedirPermisoNotificaciones()
+  await cargarPedidos()
+
+  // Actualizar cada 5 segundos
+  setInterval(cargarPedidos, 5000)
 })
